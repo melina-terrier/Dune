@@ -69,7 +69,7 @@ function initCarousel(rootSel) {
     const alt = slides[idx].querySelector('img')?.alt || '';
     const prefix = document.createElement('span');
     prefix.className = 'sr-only';
-    prefix.textContent = `Image ${idx + 1} of ${total}: `;
+    prefix.textContent = `Image ${idx + 1} of ${total}${alt ? ': ' : ''}`;
     caption.replaceChildren(prefix, document.createTextNode(alt));
   };
 
@@ -164,27 +164,40 @@ let cinemasLoaded = false;
 function loadLeaflet() {
   if (leafletPromise) return leafletPromise;
 
+  // CSS + JS chargés depuis unpkg avec SRI (vérif d'intégrité par hash SHA-256)
   [
-    'https://unpkg.com/leaflet@1.9.4/dist/leaflet.css',
-    'https://unpkg.com/leaflet.markercluster@1.5.3/dist/MarkerCluster.css',
-    'https://unpkg.com/leaflet.markercluster@1.5.3/dist/MarkerCluster.Default.css',
-  ].forEach((href) => {
+    ['https://unpkg.com/leaflet@1.9.4/dist/leaflet.css',
+     'sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY='],
+    ['https://unpkg.com/leaflet.markercluster@1.5.3/dist/MarkerCluster.css',
+     'sha256-YU3qCpj/P06tdPBJGPax0bm6Q1wltfwjsho5TR4+TYc='],
+    ['https://unpkg.com/leaflet.markercluster@1.5.3/dist/MarkerCluster.Default.css',
+     'sha256-YSWCMtmNZNwqex4CEw1nQhvFub2lmU7vcCKP+XVwwXA='],
+  ].forEach(([href, integrity]) => {
     const link = document.createElement('link');
     link.rel = 'stylesheet';
     link.href = href;
+    link.integrity = integrity;
+    link.crossOrigin = '';
     document.head.appendChild(link);
   });
 
-  const loadJs = (src) => new Promise((resolve, reject) => {
+  const loadJs = (src, integrity) => new Promise((resolve, reject) => {
     const tag = document.createElement('script');
     tag.src = src;
+    tag.integrity = integrity;
+    tag.crossOrigin = '';
     tag.onload = resolve;
     tag.onerror = reject;
     document.head.appendChild(tag);
   });
 
-  leafletPromise = loadJs('https://unpkg.com/leaflet@1.9.4/dist/leaflet.js')
-    .then(() => loadJs('https://unpkg.com/leaflet.markercluster@1.5.3/dist/leaflet.markercluster.js'));
+  leafletPromise = loadJs(
+    'https://unpkg.com/leaflet@1.9.4/dist/leaflet.js',
+    'sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo='
+  ).then(() => loadJs(
+    'https://unpkg.com/leaflet.markercluster@1.5.3/dist/leaflet.markercluster.js',
+    'sha256-Hk4dIpcqOSb0hZjgyvFOP+cEmDXUKKNE/tT542ZbNQg='
+  ));
   return leafletPromise;
 }
 
