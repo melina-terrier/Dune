@@ -104,6 +104,16 @@ h1, h2 {
     font-family: 'Barlow Condensed', sans-serif;
     font-weight: 500;
     text-transform: uppercase;
+    font-size: clamp(1.5rem, 5vh, 2.75rem);
+}
+
+/* Titres posés sur image : ombre portée pour garantir le contraste (WCAG AA) */
+#home > h1,
+#about > h2,
+#characters > h2,
+#videos > h2,
+#theaters > h2 {
+    text-shadow: 0 1px 6px rgba(0, 0, 0, 0.6);
 }
 
 @media (prefers-reduced-motion: reduce) {
@@ -121,10 +131,6 @@ h1, h2 {
 
 /* ===== PAGE : index.html ===== */
 
-h1, h2 { 
-    font-size: clamp(1.5rem, 5vh, 2.75rem); 
-}
-
 /* Loader */
 #loader {
     position: fixed;
@@ -134,10 +140,10 @@ h1, h2 {
     display: flex;
     align-items: center;
     justify-content: center;
-    transition: opacity 0.8s ease, visibility 0.8s ease;
+    transition: opacity 0.3s ease, visibility 0.3s ease;
     overflow: hidden;
-    /* Filet : si JS échoue, cache via CSS après 5s */
-    animation: loader-autohide 0.8s 5s forwards;
+    /* Filet : si JS échoue, cache via CSS après 1.5s */
+    animation: loader-autohide 0.3s 1.5s forwards;
 }
 #loader.hidden { 
     opacity: 0; 
@@ -149,7 +155,7 @@ h1, h2 {
     flex-direction: column;
     align-items: center;
     gap: 32px;
-    animation: loader-fade-in 1s ease forwards;
+    animation: loader-fade-in 0.3s ease forwards;
 }
 #loader-content img {
     width: 220px; height: auto;
@@ -166,7 +172,7 @@ h1, h2 {
     height: 100%; width: 0%;
     background: linear-gradient(90deg, var(--accent), var(--accent-light));
     border-radius: 2px;
-    animation: loader-progress 2s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+    animation: loader-progress 1s cubic-bezier(0.4, 0, 0.2, 1) forwards;
 }
 #loader-grains {
     position: absolute;
@@ -187,7 +193,7 @@ h1, h2 {
 /* Sections (scroll-snap) */
 section {
     height: 100vh;
-    height: 100svh;
+    height: 100dvh;
     background-size: cover;
     background-attachment: fixed;
     background-position: center;
@@ -300,18 +306,71 @@ header > #production {
 /* Home — AVIF avec fallback WebP */
 #home {
     background-image: url(../medias/images/dune-timothee-chalamet.webp);
+    background-image: -webkit-image-set(
+        url(../medias/images/dune-timothee-chalamet.avif) type("image/avif"),
+        url(../medias/images/dune-timothee-chalamet.webp) type("image/webp")
+    );
     background-image: image-set(
         url(../medias/images/dune-timothee-chalamet.avif) type("image/avif"),
         url(../medias/images/dune-timothee-chalamet.webp) type("image/webp")
     );
 }
-#video {
+#video-wrapper {
+    position: absolute;
+    top: 35vh;
+    left: 10vw;
     width: 45vw;
     height: calc(45vw * 390 / 640);
-    display: block;
+}
+#video,
+#video-facade {
     position: absolute;
-    top: 35vh; 
-    left: 10vw;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    display: block;
+}
+/* Façade vidéo (miniature + bouton play, avant chargement de YouTube) */
+#video-facade {
+    padding: 0;
+    border: none;
+    cursor: pointer;
+    background: #000;
+    overflow: hidden;
+}
+#video-facade > img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+#video-facade .play-icon {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 68px;
+    height: 48px;
+    border-radius: 14px;
+    background: rgba(20, 20, 20, 0.78);
+    transition: background 0.3s;
+}
+#video-facade .play-icon::before {
+    content: "";
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-35%, -50%);
+    border-style: solid;
+    border-width: 11px 0 11px 19px;
+    border-color: transparent transparent transparent #fff;
+}
+#video-facade:hover .play-icon,
+#video-facade:focus-visible .play-icon {
+    background: var(--accent);
+}
+#video-facade[hidden] {
+    display: none;
 }
 .scroll {
     position: fixed !important;
@@ -456,7 +515,7 @@ header > #production {
     height: 44px;
     border-radius: 50%;
     border: 1px solid rgba(255, 255, 255, 0.55);
-    background: rgba(0, 0, 0, 0.35);
+    background: rgba(0, 0, 0, 0.5);
     backdrop-filter: blur(6px);
     -webkit-backdrop-filter: blur(6px);
     color: white;
@@ -560,6 +619,9 @@ header > #production {
     border-radius: 999px;
     white-space: nowrap;
     z-index: 4;
+    background: rgba(8, 6, 4, 0.55);
+    backdrop-filter: blur(4px);
+    -webkit-backdrop-filter: blur(4px);
     text-shadow: 0 1px 2px rgba(0, 0, 0, 0.6);
 }
 #copyright a { 
@@ -857,6 +919,7 @@ body.error-404 {
         right: 3vw;
         flex-direction: column;
         gap: 3vw;
+        z-index: 4;
     }
     #dune {
         width: 38vw;
@@ -886,6 +949,8 @@ body.error-404 {
         width: 88vw;
         height: calc(88vw * 390 / 640);
         position: relative;
+        top: auto;
+        left: auto;
     }
     #video { 
         position: absolute; 
@@ -908,20 +973,21 @@ body.error-404 {
         gap: 2vh;
         padding: 8vh 0 14vh;
     }
-    #about > picture { 
-        width: 60%; 
-        align-self: flex-end; 
-        top: 0; 
-        left: 0; 
+    #about > picture {
+        width: 45%;
+        align-self: flex-end;
+        top: 0;
+        left: 0;
     }
     #about > h2 { 
         top: 0; 
         padding: 0 0 0 6%; 
     }
-    #about > p { 
-        columns: 1; 
-        top: 0; 
-        line-height: 1.7; 
+    #about > p {
+        columns: 1;
+        top: 0;
+        font-size: 0.72rem;
+        line-height: 1.5;
     }
 
     #characters {
