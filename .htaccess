@@ -2,11 +2,15 @@
 
 ErrorDocument 404 /404.html
 
+<IfModule mod_mime.c>
+    AddType application/manifest+json .webmanifest
+</IfModule>
+
 <IfModule mod_brotli.c>
-    AddOutputFilterByType BROTLI_COMPRESS text/html text/xml text/css text/javascript application/javascript application/json application/xml image/svg+xml
+    AddOutputFilterByType BROTLI_COMPRESS text/html text/xml text/css text/javascript application/javascript application/json application/manifest+json application/xml image/svg+xml
 </IfModule>
 <IfModule mod_deflate.c>
-    AddOutputFilterByType DEFLATE text/html text/xml text/css text/javascript application/javascript application/json application/xml image/svg+xml
+    AddOutputFilterByType DEFLATE text/html text/xml text/css text/javascript application/javascript application/json application/manifest+json application/xml image/svg+xml
 </IfModule>
 
 <IfModule mod_headers.c>
@@ -19,6 +23,9 @@ ErrorDocument 404 /404.html
     <FilesMatch "\.html$">
         Header set Cache-Control "no-cache, must-revalidate"
     </FilesMatch>
+    <FilesMatch "\.(webmanifest|json)$">
+        Header set Cache-Control "public, max-age=86400"
+    </FilesMatch>
 
     Header always set X-Content-Type-Options "nosniff"
     Header always set Referrer-Policy "strict-origin-when-cross-origin"
@@ -27,12 +34,14 @@ ErrorDocument 404 /404.html
     Header always set Strict-Transport-Security "max-age=31536000; includeSubDomains; preload"
     Header always set Content-Security-Policy "default-src 'self'; \
         script-src 'self' https://www.youtube.com https://unpkg.com; \
-        style-src 'self' https://unpkg.com; \
+        style-src 'self' https://unpkg.com 'sha256-0AkTRhF4FcCbYpF/hWDINjbqy0YOQMWB9oRxZCkdgEA='; \
         font-src 'self'; \
-        img-src 'self' data: https://tile.openstreetmap.org https://i.ytimg.com; \
+        img-src 'self' data: https://tile.openstreetmap.org; \
         frame-src https://www.youtube.com https://www.youtube-nocookie.com; \
         connect-src 'self' https://unpkg.com; \
         object-src 'none'; \
         base-uri 'self'; \
-        form-action 'self'"
+        form-action 'self'; \
+        frame-ancestors 'self'; \
+        upgrade-insecure-requests"
 </IfModule>
