@@ -64,6 +64,49 @@ function initCarousel(rootSel) {
 
   let i = 0;
 
+  // Lazy : diffère le téléchargement des diapos non visibles. srcset/src déplacé
+  // en data-* puis restauré à la demande (diapo affichée + ses voisines).
+  slides.forEach((pic, idx) => {
+    if (idx === 0) { pic.dataset.loaded = '1'; return; }
+    pic.querySelectorAll('source[srcset]').forEach((s) => {
+      s.dataset.srcset = s.getAttribute('srcset');
+      s.removeAttribute('srcset');
+    });
+    const img = pic.querySelector('img');
+    if (img) {
+      if (img.getAttribute('srcset')) {
+        img.dataset.srcset = img.getAttribute('srcset');
+        img.removeAttribute('srcset');
+      }
+      img.dataset.src = img.getAttribute('src');
+      img.removeAttribute('src');
+    }
+  });
+
+  const loadSlide = (idx) => {
+    const pic = slides[idx];
+    if (!pic || pic.dataset.loaded) return;
+    pic.dataset.loaded = '1';
+    pic.querySelectorAll('source[data-srcset]').forEach((s) => {
+      s.setAttribute('srcset', s.dataset.srcset);
+      delete s.dataset.srcset;
+    });
+    const img = pic.querySelector('img[data-src]');
+    if (img) {
+      if (img.dataset.srcset) img.setAttribute('srcset', img.dataset.srcset);
+      img.setAttribute('src', img.dataset.src);
+      delete img.dataset.src;
+      delete img.dataset.srcset;
+    }
+  };
+
+  // Charge la diapo + ses deux voisines (clic suivant/précédent instantané).
+  const preload = (idx) => {
+    loadSlide(idx);
+    loadSlide((idx + 1) % total);
+    loadSlide((idx - 1 + total) % total);
+  };
+
   const setCaption = (idx) => {
     if (!caption) return;
     const alt = slides[idx].querySelector('img')?.alt || '';
@@ -75,6 +118,7 @@ function initCarousel(rootSel) {
 
   const show = (next) => {
     if (next === i) return;
+    preload(next);
     slides[i].classList.remove('active');
     slides[i].inert = true;
     slides[next].classList.add('active');
@@ -86,6 +130,7 @@ function initCarousel(rootSel) {
   slides[0].classList.add('active');
   slides.forEach((s, idx) => { if (idx !== 0) s.inert = true; });
   setCaption(0);
+  preload(0); // diapo active + voisines prêtes pour un premier clic instantané
 
   const goNext = () => show((i + 1) % total);
   const goPrev = () => show((i - 1 + total) % total);
@@ -102,22 +147,37 @@ function initCarousel(rootSel) {
 
 
 /* ============================================================
-   3. YOUTUBE — player + PiP au scroll
+   3. YOUTUBE — façade « click-to-load » + PiP au scroll
    ============================================================ */
 
 let player;
 let pipThreshold = Infinity;
+let pipThresholdDirty = false;
+let ytApiPromise = null;
 
-// L'API YT (chargée dans index.html) cherche window.onYouTubeIframeAPIReady
-window.onYouTubeIframeAPIReady = () => {
+// Charge l'API YouTube à la demande (au clic), pas au chargement de la page :
+// gros gain perf (pas de JS tiers ni de requête YouTube avant interaction).
+function loadYouTubeApi() {
+  if (ytApiPromise) return ytApiPromise;
+  ytApiPromise = new Promise((resolve, reject) => {
+    window.onYouTubeIframeAPIReady = resolve;
+    const tag = document.createElement('script');
+    tag.src = 'https://www.youtube.com/iframe_api';
+    tag.onerror = reject;
+    document.head.appendChild(tag);
+  });
+  return ytApiPromise;
+}
+
+function createPlayer() {
   player = new YT.Player('video', {
     height: '390',
     width: '640',
     videoId: '8g18jFHCLXk',
     host: 'https://www.youtube-nocookie.com',
     playerVars: {
+      autoplay: 1, // le clic sur la façade fournit le geste utilisateur requis
       color: 'white',
-      enablejsapi: 1,
       rel: 0,
       playsinline: 1,
       hl: 'en',
@@ -125,7 +185,26 @@ window.onYouTubeIframeAPIReady = () => {
     },
     events: { onReady: onPlayerReady, onStateChange: checkPip },
   });
-};
+}
+
+// Façade (miniature + bouton play). Au clic : charge l'API puis crée le player.
+const videoFacade = document.querySelector('#video-facade');
+if (videoFacade) {
+  let loading = false;
+  videoFacade.addEventListener('click', async () => {
+    if (loading) return;
+    loading = true;
+    videoFacade.disabled = true;
+    try {
+      await loadYouTubeApi();
+      createPlayer();
+      videoFacade.hidden = true;
+    } catch {
+      loading = false;
+      videoFacade.disabled = false;
+    }
+  });
+}
 
 function onPlayerReady(event) {
   event.target.setVolume(50);
@@ -136,16 +215,25 @@ function onPlayerReady(event) {
 
 function recalcPipThreshold() {
   const video = document.querySelector('#video');
-  if (!video || video.classList.contains('scroll')) return;
+  if (!video) return;
+  // En mode épinglé la vidéo est `position: fixed` et réduite : sa géométrie
+  // ne reflète plus sa place naturelle. On diffère le recalcul jusqu'à la
+  // sortie du mode PiP (cf. checkPip) pour ne pas figer un seuil faux.
+  if (video.classList.contains('scroll')) { pipThresholdDirty = true; return; }
   const rect = video.getBoundingClientRect();
   pipThreshold = rect.top + scrollY + 0.75 * rect.height;
+  pipThresholdDirty = false;
 }
 
 function checkPip() {
   const video = document.querySelector('#video');
   if (!video) return;
   const isPlaying = player?.getPlayerState?.() === 1;
-  video.classList.toggle('scroll', scrollY > pipThreshold && isPlaying);
+  const pinned = scrollY > pipThreshold && isPlaying;
+  video.classList.toggle('scroll', pinned);
+  // Un resize survenu pendant l'épinglage a marqué le seuil « périmé » :
+  // on le recalcule dès qu'on sort du mode PiP, géométrie redevenue fiable.
+  if (!pinned && pipThresholdDirty) recalcPipThreshold();
 }
 
 recalcPipThreshold();
@@ -161,6 +249,11 @@ let leafletPromise = null;
 let map;
 let cinemasLoaded = false;
 
+/* MAINTENANCE — Leaflet & markercluster sont ÉPINGLÉS aux versions ci-dessous,
+   avec SRI en dur. Pour bumper une version, régénérer CHAQUE hash, sinon le
+   navigateur rejette la ressource (intégrité) et la carte ne se charge pas :
+     curl -s <url> | openssl dgst -sha256 -binary | openssl base64 -A
+   puis préfixer le résultat par "sha256-". */
 function loadLeaflet() {
   if (leafletPromise) return leafletPromise;
 
@@ -226,7 +319,27 @@ function buildCinemaPopup(p) {
   return div;
 }
 
-function addCinemasLayer(geojson) {
+// Rayon de la « zone » affichée autour de la position (cf. texte de la page).
+const NEARBY_RADIUS_KM = 200;
+
+function nearbyFeatures(geojson, center) {
+  const features = geojson?.features || [];
+  if (!center) return features;
+  // Pré-filtre par boîte englobante : évite de matérialiser toute la France
+  // (~2000 marqueurs) alors que seuls ceux « de ta région » sont pertinents.
+  const dLat = NEARBY_RADIUS_KM / 111;
+  const dLng = NEARBY_RADIUS_KM /
+    (111 * Math.cos((center.latitude * Math.PI) / 180));
+  return features.filter((f) => {
+    const c = f.geometry?.coordinates; // [lng, lat]
+    return c &&
+      Math.abs(c[1] - center.latitude) <= dLat &&
+      Math.abs(c[0] - center.longitude) <= dLng;
+  });
+}
+
+function addCinemasLayer(geojson, center) {
+  const feats = nearbyFeatures(geojson, center);
   const icon = L.icon({
     iconUrl: 'medias/logos/clapperboard.png',
     iconSize: [30, 30],
@@ -239,7 +352,7 @@ function addCinemasLayer(geojson) {
     spiderfyOnMaxZoom: true,
   });
   // Popup bindé par marqueur (sinon perdu en re-parentant vers le cluster)
-  L.geoJSON(geojson, {
+  L.geoJSON(feats, {
     pointToLayer: (feature, latlng) => {
       const p = feature.properties || {};
       return L.marker(latlng, {
@@ -250,6 +363,7 @@ function addCinemasLayer(geojson) {
     },
   }).eachLayer((layer) => cluster.addLayer(layer));
   map.addLayer(cluster);
+  return feats.length;
 }
 
 /* --- Géolocalisation --- */
@@ -266,9 +380,9 @@ const LOCATION_ERRORS = {
 };
 
 function onLocationSuccess({ coords }) {
-  setCoords(
-    `Latitude: ${coords.latitude.toFixed(3)}°, longitude: ${coords.longitude.toFixed(3)}°`
-  );
+  const coordsText =
+    `Latitude: ${coords.latitude.toFixed(3)}°, longitude: ${coords.longitude.toFixed(3)}°`;
+  setCoords(coordsText);
   map.setZoom(10);
   map.panTo([coords.latitude, coords.longitude]);
 
@@ -289,7 +403,12 @@ function onLocationSuccess({ coords }) {
   cinemasLoaded = true;
   fetch('medias/cinema.json')
     .then((r) => r.json())
-    .then(addCinemasLayer)
+    .then((geojson) => {
+      const count = addCinemasLayer(geojson, coords);
+      if (!count) {
+        setCoords(`${coordsText} — No cinemas found within ${NEARBY_RADIUS_KM} km.`);
+      }
+    })
     .catch(() => {
       cinemasLoaded = false;
       setCoords('Could not load nearby cinemas.');
@@ -337,7 +456,8 @@ if (theatersSection) {
   const obs = new IntersectionObserver(
     (entries, o) => {
       if (entries.some((e) => e.isIntersecting)) {
-        loadLeaflet().then(initMap).catch(() => {});
+        loadLeaflet().then(initMap)
+          .catch((e) => console.warn('Leaflet preload failed:', e));
         o.disconnect();
       }
     },

@@ -40,13 +40,58 @@
     <link rel="icon" type="image/png" sizes="192x192" href="medias/favicon/icon-192.png">
     <link rel="icon" type="image/png" sizes="512x512" href="medias/favicon/icon-512.png">
     <link rel="apple-touch-icon" sizes="180x180" href="medias/favicon/apple-touch-icon.png">
+    <link rel="manifest" href="manifest.webmanifest">
 
-    <link rel="preconnect" href="https://www.youtube.com">
-    <link rel="preconnect" href="https://i.ytimg.com">
-    <link rel="preconnect" href="https://tile.openstreetmap.org" crossorigin>
+    <link rel="dns-prefetch" href="https://tile.openstreetmap.org">
     <link rel="preload" as="font" type="font/woff2" href="medias/fonts/inter-400-latin.woff2" crossorigin>
     <link rel="preload" as="font" type="font/woff2" href="medias/fonts/barlow-condensed-500-latin.woff2" crossorigin>
     <link rel="stylesheet" href="style/style.css">
+
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "Movie",
+      "name": "Dune",
+      "url": "https://dune.melinaterrier.fr/",
+      "image": "https://dune.melinaterrier.fr/medias/images/dune-timothee-chalamet.jpg",
+      "description": "The big-screen adaptation of Frank Herbert's seminal bestselling book, directed by Denis Villeneuve.",
+      "datePublished": "2021-10-22",
+      "duration": "PT155M",
+      "genre": ["Science Fiction", "Adventure", "Drama"],
+      "inLanguage": "en",
+      "director": { "@type": "Person", "name": "Denis Villeneuve" },
+      "author": [
+        { "@type": "Person", "name": "Denis Villeneuve" },
+        { "@type": "Person", "name": "Jon Spaihts" },
+        { "@type": "Person", "name": "Eric Roth" }
+      ],
+      "actor": [
+        { "@type": "Person", "name": "Timothée Chalamet" },
+        { "@type": "Person", "name": "Rebecca Ferguson" },
+        { "@type": "Person", "name": "Oscar Isaac" },
+        { "@type": "Person", "name": "Jason Momoa" },
+        { "@type": "Person", "name": "Josh Brolin" },
+        { "@type": "Person", "name": "Zendaya" },
+        { "@type": "Person", "name": "Javier Bardem" },
+        { "@type": "Person", "name": "Stellan Skarsgård" },
+        { "@type": "Person", "name": "Dave Bautista" },
+        { "@type": "Person", "name": "Chang Chen" },
+        { "@type": "Person", "name": "Sharon Duncan-Brewster" }
+      ],
+      "productionCompany": [
+        { "@type": "Organization", "name": "Warner Bros. Pictures" },
+        { "@type": "Organization", "name": "Legendary Pictures" }
+      ],
+      "trailer": {
+        "@type": "VideoObject",
+        "name": "Dune — Official Trailer",
+        "embedUrl": "https://www.youtube-nocookie.com/embed/8g18jFHCLXk",
+        "thumbnailUrl": "https://dune.melinaterrier.fr/medias/images/trailer-thumb.jpg",
+        "uploadDate": "2020-09-09"
+      }
+    }
+    </script>
+    <noscript><style>#loader { display: none !important; }</style></noscript>
 </head>
 
 <body>
@@ -65,7 +110,7 @@
 
     <header>
         <a href="#home" aria-label="Back to top">
-            <img id="dune" src="medias/poster/tt.webp" alt="" width="600" height="54">
+            <img id="dune" src="medias/poster/tt.webp" alt="Dune" width="600" height="54">
         </a>
 
         <button id="menu-toggle" type="button" aria-label="Toggle navigation menu" aria-expanded="false" aria-controls="menu">
@@ -110,13 +155,17 @@
         <h1 id="home-heading">Only in cinemas</h1>
         <div id="video-wrapper">
             <div id="video"></div>
+            <button id="video-facade" type="button" aria-label="Play the official Dune trailer">
+                <img src="medias/images/trailer-thumb.jpg" alt="" width="1280" height="720" decoding="async">
+                <span class="play-icon" aria-hidden="true"></span>
+            </button>
         </div>
     </section>
 
     <section id="about" data-bg="medias/images/dune-sharon-duncan-brewster.webp" aria-labelledby="about-heading">
         <picture>
-            <source type="image/avif" srcset="medias/images/denis_villeneuve-960w.avif 960w, medias/images/denis_villeneuve.avif 1600w" sizes="(max-width: 768px) 60vw, 30vw">
-            <source type="image/webp" srcset="medias/images/denis_villeneuve-960w.webp 960w, medias/images/denis_villeneuve.webp 1600w" sizes="(max-width: 768px) 60vw, 30vw">
+            <source type="image/avif" srcset="medias/images/denis_villeneuve-480w.avif 480w, medias/images/denis_villeneuve-960w.avif 960w, medias/images/denis_villeneuve.avif 1600w" sizes="(max-width: 768px) 60vw, 30vw">
+            <source type="image/webp" srcset="medias/images/denis_villeneuve-480w.webp 480w, medias/images/denis_villeneuve-960w.webp 960w, medias/images/denis_villeneuve.webp 1600w" sizes="(max-width: 768px) 60vw, 30vw">
             <img src="medias/images/denis_villeneuve.webp" alt="Director Denis Villeneuve on set" loading="lazy" decoding="async" width="1600" height="994">
         </picture>
         <h2 id="about-heading">About the film</h2>
@@ -136,7 +185,7 @@
                 <picture><source type="image/avif" srcset="medias/characters/chani-480w.avif 480w, medias/characters/chani.avif 903w" sizes="(max-width: 768px) 70vw, 380px"><source type="image/webp" srcset="medias/characters/chani-480w.webp 480w, medias/characters/chani.webp 903w" sizes="(max-width: 768px) 70vw, 380px"><img src="medias/characters/chani.webp" alt="Zendaya: Chani" loading="lazy" width="903" height="1050" decoding="async"></picture>
                 <picture><source type="image/avif" srcset="medias/characters/stilgar-480w.avif 480w, medias/characters/stilgar.avif 903w" sizes="(max-width: 768px) 70vw, 380px"><source type="image/webp" srcset="medias/characters/stilgar-480w.webp 480w, medias/characters/stilgar.webp 903w" sizes="(max-width: 768px) 70vw, 380px"><img src="medias/characters/stilgar.webp" alt="Javier Bardem: Stilgar" loading="lazy" width="903" height="1050" decoding="async"></picture>
                 <picture><source type="image/avif" srcset="medias/characters/liet_kynes-480w.avif 480w, medias/characters/liet_kynes.avif 903w" sizes="(max-width: 768px) 70vw, 380px"><source type="image/webp" srcset="medias/characters/liet_kynes-480w.webp 480w, medias/characters/liet_kynes.webp 903w" sizes="(max-width: 768px) 70vw, 380px"><img src="medias/characters/liet_kynes.webp" alt="Sharon Duncan-Brewster: Liet Kynes" loading="lazy" width="903" height="1050" decoding="async"></picture>
-                <picture><source type="image/avif" srcset="medias/characters/baron_harkonnen-480w.avif 480w, medias/characters/baron_harkonnen.avif 903w" sizes="(max-width: 768px) 70vw, 380px"><source type="image/webp" srcset="medias/characters/baron_harkonnen-480w.webp 480w, medias/characters/baron_harkonnen.webp 903w" sizes="(max-width: 768px) 70vw, 380px"><img src="medias/characters/baron_harkonnen.webp" alt="Stellan Skarsgard: Baron Harkonnen" loading="lazy" width="903" height="1050" decoding="async"></picture>
+                <picture><source type="image/avif" srcset="medias/characters/baron_harkonnen-480w.avif 480w, medias/characters/baron_harkonnen.avif 903w" sizes="(max-width: 768px) 70vw, 380px"><source type="image/webp" srcset="medias/characters/baron_harkonnen-480w.webp 480w, medias/characters/baron_harkonnen.webp 903w" sizes="(max-width: 768px) 70vw, 380px"><img src="medias/characters/baron_harkonnen.webp" alt="Stellan Skarsgård: Baron Harkonnen" loading="lazy" width="903" height="1050" decoding="async"></picture>
                 <picture><source type="image/avif" srcset="medias/characters/rabban_harkonnen-480w.avif 480w, medias/characters/rabban_harkonnen.avif 903w" sizes="(max-width: 768px) 70vw, 380px"><source type="image/webp" srcset="medias/characters/rabban_harkonnen-480w.webp 480w, medias/characters/rabban_harkonnen.webp 903w" sizes="(max-width: 768px) 70vw, 380px"><img src="medias/characters/rabban_harkonnen.webp" alt="Dave Bautista: Rabban Harkonnen" loading="lazy" width="903" height="1050" decoding="async"></picture>
             </div>
             <div class="navigation">
@@ -151,11 +200,11 @@
         <h2 id="videos-heading">Videos & images</h2>
         <div id="videos-carousel" role="region" aria-roledescription="carousel" aria-label="Film stills" tabindex="0">
             <div class="slides">
-                <picture class="active"><source type="image/avif" srcset="medias/images/10-960w.avif 960w, medias/images/10.avif 1920w" sizes="(max-width: 768px) 90vw, 70vw"><source type="image/webp" srcset="medias/images/10-960w.webp 960w, medias/images/10.webp 1920w" sizes="(max-width: 768px) 90vw, 70vw"><img src="medias/images/10.webp" alt="" loading="lazy" decoding="async" width="1920" height="804"></picture>
-                <picture><source type="image/avif" srcset="medias/images/12-960w.avif 960w, medias/images/12.avif 1920w" sizes="(max-width: 768px) 90vw, 70vw"><source type="image/webp" srcset="medias/images/12-960w.webp 960w, medias/images/12.webp 1920w" sizes="(max-width: 768px) 90vw, 70vw"><img src="medias/images/12.webp" alt="" loading="lazy" decoding="async" width="1920" height="804"></picture>
-                <picture><source type="image/avif" srcset="medias/images/13-960w.avif 960w, medias/images/13.avif 1920w" sizes="(max-width: 768px) 90vw, 70vw"><source type="image/webp" srcset="medias/images/13-960w.webp 960w, medias/images/13.webp 1920w" sizes="(max-width: 768px) 90vw, 70vw"><img src="medias/images/13.webp" alt="" loading="lazy" decoding="async" width="1920" height="804"></picture>
-                <picture><source type="image/avif" srcset="medias/images/14-960w.avif 960w, medias/images/14.avif 1920w" sizes="(max-width: 768px) 90vw, 70vw"><source type="image/webp" srcset="medias/images/14-960w.webp 960w, medias/images/14.webp 1920w" sizes="(max-width: 768px) 90vw, 70vw"><img src="medias/images/14.webp" alt="" loading="lazy" decoding="async" width="1920" height="804"></picture>
-                <picture><source type="image/avif" srcset="medias/images/17-960w.avif 960w, medias/images/17.avif 1920w" sizes="(max-width: 768px) 90vw, 70vw"><source type="image/webp" srcset="medias/images/17-960w.webp 960w, medias/images/17.webp 1920w" sizes="(max-width: 768px) 90vw, 70vw"><img src="medias/images/17.webp" alt="" loading="lazy" decoding="async" width="1920" height="804"></picture>
+                <picture class="active"><source type="image/avif" srcset="medias/images/10-960w.avif 960w, medias/images/10.avif 1920w" sizes="(max-width: 768px) 90vw, 70vw"><source type="image/webp" srcset="medias/images/10-960w.webp 960w, medias/images/10.webp 1920w" sizes="(max-width: 768px) 90vw, 70vw"><img src="medias/images/10.webp" alt="A young man in black extends his hand toward a hooded figure in dark armor, in a dim library-like room" loading="lazy" decoding="async" width="1920" height="804"></picture>
+                <picture><source type="image/avif" srcset="medias/images/12-960w.avif 960w, medias/images/12.avif 1920w" sizes="(max-width: 768px) 90vw, 70vw"><source type="image/webp" srcset="medias/images/12-960w.webp 960w, medias/images/12.webp 1920w" sizes="(max-width: 768px) 90vw, 70vw"><img src="medias/images/12.webp" alt="Close-up portrait of a bearded man with wet dark hair, dressed in black, against a desert landscape under a grey sky" loading="lazy" decoding="async" width="1920" height="804"></picture>
+                <picture><source type="image/avif" srcset="medias/images/13-960w.avif 960w, medias/images/13.avif 1920w" sizes="(max-width: 768px) 90vw, 70vw"><source type="image/webp" srcset="medias/images/13-960w.webp 960w, medias/images/13.webp 1920w" sizes="(max-width: 768px) 90vw, 70vw"><img src="medias/images/13.webp" alt="Portrait of a woman with tied-back hair, dressed in black, with a fixed gaze and grave expression, in a dim setting" loading="lazy" decoding="async" width="1920" height="804"></picture>
+                <picture><source type="image/avif" srcset="medias/images/14-960w.avif 960w, medias/images/14.avif 1920w" sizes="(max-width: 768px) 90vw, 70vw"><source type="image/webp" srcset="medias/images/14-960w.webp 960w, medias/images/14.webp 1920w" sizes="(max-width: 768px) 90vw, 70vw"><img src="medias/images/14.webp" alt="Man in dark robes with downcast eyes, a distinctive mark on his forehead, in a dimly lit corridor" loading="lazy" decoding="async" width="1920" height="804"></picture>
+                <picture><source type="image/avif" srcset="medias/images/17-960w.avif 960w, medias/images/17.avif 1920w" sizes="(max-width: 768px) 90vw, 70vw"><source type="image/webp" srcset="medias/images/17-960w.webp 960w, medias/images/17.webp 1920w" sizes="(max-width: 768px) 90vw, 70vw"><img src="medias/images/17.webp" alt="Figure wearing a dark hood and a metallic collar, with intensely blue eyes, standing in a large amber-lit hall with silhouettes in the background" loading="lazy" decoding="async" width="1920" height="804"></picture>
             </div>
             <div class="navigation">
                 <button class="prev" type="button" aria-label="Previous image">&#10094;</button>
@@ -200,6 +249,5 @@
     </footer>
     
     <script type="module" src="script/script.js"></script>
-    <script src="https://www.youtube.com/iframe_api"></script>
 </body>
 </html>

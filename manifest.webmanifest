@@ -1,0 +1,32 @@
+{
+  "name": "Dune — Denis Villeneuve's Epic Film",
+  "short_name": "Dune",
+  "description": "The big-screen adaptation of Frank Herbert's seminal bestselling book, directed by Denis Villeneuve. Only in cinemas.",
+  "lang": "en",
+  "start_url": "/",
+  "scope": "/",
+  "display": "standalone",
+  "orientation": "any",
+  "background_color": "#080604",
+  "theme_color": "#080604",
+  "icons": [
+    {
+      "src": "medias/favicon/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "medias/favicon/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "medias/favicon/favicon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any"
+    }
+  ]
+}
