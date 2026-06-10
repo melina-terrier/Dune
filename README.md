@@ -29,11 +29,18 @@ Points notables :
 
 ## Lancer en local
 
+Le site utilise des **ES Modules** et `fetch()` : il faut le servir en HTTP
+(l'ouvrir en `file://` ne fonctionne pas). Au choix :
+
 ```bash
-docker compose up
+python3 -m http.server 8082
 ```
 
-Puis ouvrir [http://localhost:8082](http://localhost:8082).
+…ou l'extension **Live Server** de VS Code. Puis ouvrir
+[http://localhost:8082](http://localhost:8082).
+
+> En prod, la sécurité/perf (CSP, SRI, compression, cache) est gérée par
+> `.htaccess` (Apache/OVH) ; un serveur statique local ne l'applique pas.
 
 ---
 
